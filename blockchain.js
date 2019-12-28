@@ -3,6 +3,7 @@ const Block = require('./block')
 class Blockchain {
   constructor () {
     this.chain = [this.createGenesisBlock()]
+    this.difficulty = 4
   }
 
   createGenesisBlock () {
@@ -17,7 +18,27 @@ class Blockchain {
   addNewBlock (newBlock) {
     newBlock.index = this.getLastBlock().index + 1
     newBlock.hash = newBlock.calculateHash()
+    newBlock.mineBlock(this.difficulty)
     this.chain.push(newBlock)
+  }
+
+  isChainValid () {
+    const chain = this.chain
+
+    for (let i = 0; i < chain.length; i++) {
+      if (chain[i].hash !== chain[i].calculateHash()) {
+        console.log(`Block ${i} has been corrupted`)
+        return false
+      }
+
+      if (i > 0 && chain[i].previousHash !== chain[i - 1].hash) {
+        console.log(`Block ${i - 1} has been corrupted`)
+        return false
+      }
+    }
+
+    console.log('Chain is valid')
+    return true
   }
 }
 
